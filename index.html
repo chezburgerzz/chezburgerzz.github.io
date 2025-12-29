@@ -7,7 +7,151 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comfortaa', sans-serif;
+      background: #191919; /* only this color visible normally */
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Chezburger pattern – super oversized to cover EVERYTHING with no gaps */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -80%;                    /* huge negative margins → overflows massively */
+      background-image: url('https://i.ibb.co/jk0rV705/chezburger.png');
+      background-repeat: repeat;
+      background-size: 140px;         /* bigger burgers for denser coverage */
+      opacity: 0.08;
+      transform: rotate(-15deg) scale(2.2); /* extra scale for full bleed */
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Dark overlay keeps text readable over burgers */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.68);
+      z-index: -2;
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      max-width: 1100px;
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      background: rgba(25, 25, 25, 0.85);
+      border-radius: 28px;
+      padding: 50px 55px;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.7);
+      border: 1px solid rgba(60, 60, 60, 0.6);
+      backdrop-filter: blur(10px);
+      transition: all 0.35s ease;
+      flex: 1;
+      min-width: 340px;
+      max-width: 520px;
+    }
+
+    .card:hover {
+      transform: translateY(-12px) scale(1.03);
+      box-shadow: 0 30px 70px rgba(255, 193, 7, 0.22), 0 0 30px rgba(255, 193, 7, 0.12);
+      border-color: #ffc10766;
+    }
+
+    .left .username {
+      font-size: 3.4rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+
+    .left .tagline {
+      font-size: 1.25rem;
+      color: #bbbbbb;
+      font-weight: 400;
+      margin-bottom: 28px;
+    }
+
+    .left .projects-title {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: #eeeeee;
+    }
+
+    .right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 300px;
+    }
+
+    /* Jumpscare: Rock image – completely hidden until click, no preload visibility */
+    #jumpscare {
+      position: fixed;
+      inset: 0;
+      background: url('https://i.ibb.co/8prt1sz/the-rock-image.jpg') no-repeat center center / cover;
+      background-color: #000;
+      opacity: 0;
+      display: none;                    /* stays hidden, no rendering */
+      pointer-events: none;
+      transition: opacity 0.2s ease-in;
+      z-index: 9999;
+    }
+
+    #jumpscare.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .watermark {
+      position: fixed;
+      bottom: 16px;
+      right: 24px;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffc107;
+      opacity: 0.14;
+      cursor: pointer;
+      letter-spacing: -0.5px;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+
+    .watermark:hover {
+      opacity: 0.5;
+    }
+
+    @media (max-width: 900px) {
+      .container { flex-direction: column; gap: 30px; }
+      .card { max-width: 100%; padding: 40px 35px; border-radius: 24px; }
+      .left .username { font-size: 2.8rem; }
+      .left .tagline, .left .projects-title { font-size: 1.15rem; }
+      .watermark { font-size: 1.2rem; right: 20px; bottom: 14px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -33,7 +177,27 @@
 
   <div class="watermark" onclick="triggerJumpscare()">chezburgerzz</div>
 
-  
+  <script>
+    function triggerJumpscare() {
+      const overlay = document.getElementById('jumpscare');
+      const audio = document.getElementById('rockSound');
+
+      overlay.style.display = 'block';  // reveal just in time
+      setTimeout(() => {                 // tiny delay helps force reflow
+        overlay.classList.add('active');
+      }, 10);
+
+      audio.currentTime = 0;
+      audio.play().catch(e => console.log("Audio needs interaction:", e));
+
+      setTimeout(() => {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+          overlay.style.display = 'none'; // hide again after fade
+        }, 300);
+      }, 1600); // visible for ~1.6s
+    }
+  </script>
 
 </body>
 </html>
